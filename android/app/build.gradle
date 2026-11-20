@@ -1,0 +1,40 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'io.soundconnect.android'
+    compileSdk 35
+    buildToolsVersion '36.0.0'
+    ndkVersion '28.2.13676358'
+    defaultConfig {
+        applicationId 'io.soundconnect.android'
+        minSdk 28
+        targetSdk 35
+        versionCode 1
+        versionName '0.2.0'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64' }
+        externalNativeBuild { cmake { arguments '-DANDROID_STL=c++_shared'; cppFlags '-std=c++20' } }
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    externalNativeBuild { cmake { path 'src/main/cpp/CMakeLists.txt'; version providers.gradleProperty('cmakeVersion').getOrElse('3.31.6') } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    buildTypes { release { minifyEnabled false } }
+    lint { abortOnError true }
+    sourceSets {
+        androidTest.assets.srcDirs = ['src/androidTest/assets']
+    }
+}
+
+dependencies {
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+}
+
+tasks.register('prepareReplayFixtures', Copy) {
+    from('../../upstream/SonyHeadphonesClient/tests/WH-1000XM3-4.5.2') { include '*-rx.*.bin'; into 'xm3' }
+    from('../../upstream/SonyHeadphonesClient/tests/WF-1000XM5-6.1.0') { include '*-rx.*.bin'; into 'xm5' }
+    from('../../upstream/SonyHeadphonesClient/tests/WF-LC900-2.0.3-equalizer') { include '*-rx.*.bin'; into 'clip' }
+    into layout.buildDirectory.dir('generated/replayAssets')
+}
+android.sourceSets.androidTest.assets.srcDir(layout.buildDirectory.dir('generated/replayAssets'))
+tasks.configureEach { if (name.contains('AndroidTest')) dependsOn 'prepareReplayFixtures' }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

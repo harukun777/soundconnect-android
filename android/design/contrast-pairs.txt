@@ -1,0 +1,4 @@
+# Foreground/background from Android resource tokens
+#F4F2EE #191919
+#C5C1B8 #191919
+#D8BC83 #191919

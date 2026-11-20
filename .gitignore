@@ -14,3 +14,10 @@ engine/bin/
 # Updater signing keys live outside the repo; never commit one
 *.key
 *.key.pub
+
+# Android local tooling and generated outputs
+android/.gradle/
+android/.cxx/
+android/app/.cxx/
+android/local.properties
+.cache/

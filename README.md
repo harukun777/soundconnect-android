@@ -1,5 +1,10 @@
 ﻿# SoundConnect Android 9 Compatibility
 
+Android 9（API 28）以降向けのネイティブアプリは [`android/`](android/README.md) にあります。
+Windows用DLLを使わず、既存のlibmdrをAndroid向けにビルドしてBluetooth RFCOMMに接続します。
+ビルド方法、対応機能、未移植の機能は [Android版README](android/README.md) を参照してください。
+以下は元のWindows版の説明です。
+
 # SoundConnect Desktop
 
 An unofficial Windows app for controlling Sony headphones from your PC: noise

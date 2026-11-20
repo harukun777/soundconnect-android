@@ -1,0 +1,24 @@
+<resources>
+    <color name="surface">#191919</color>
+    <color name="text">#F4F2EE</color>
+    <color name="secondary">#C5C1B8</color>
+    <color name="accent">#D8BC83</color>
+    <dimen name="gutter">16dp</dimen>
+    <dimen name="gap">8dp</dimen>
+    <dimen name="section_gap">24dp</dimen>
+    <dimen name="touch_target">48dp</dimen>
+    <dimen name="title">28sp</dimen>
+    <dimen name="section_title">20sp</dimen>
+    <dimen name="body">16sp</dimen>
+    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/surface</item>
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:textColorPrimary">@color/text</item>
+        <item name="android:textColorSecondary">@color/secondary</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+</resources>
