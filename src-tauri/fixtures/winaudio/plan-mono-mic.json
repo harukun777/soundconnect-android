@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "change": {
+        "kind": "setHandsFree",
+        "address": "AA:BB:CC:12:34:56",
+        "enabled": true
+      },
+      "summary": "Turn the hands-free profile on.",
+      "admin": true
+    },
+    {
+      "change": {
+        "kind": "useHandsFreeForCommunications",
+        "address": "AA:BB:CC:12:34:56"
+      },
+      "summary": "Use the headphone mic for voice chat and calls.",
+      "admin": false
+    }
+  ],
+  "notes": [
+    "Sound is mono while an app uses the mic."
+  ]
+}

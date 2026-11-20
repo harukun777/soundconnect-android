@@ -1,0 +1,39 @@
+.pairing-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* The <ul> keeps its list semantics; the bullets are drawn as accent dots instead of markers. */
+.pairing-steps__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  list-style: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.pairing-steps__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* A 6px dot centred on the first line of its step. */
+.pairing-steps__bullet {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: calc((var(--font-size-md) * var(--leading-normal) - 6px) / 2);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.pairing-steps__text {
+  font-size: var(--font-size-md);
+  line-height: var(--leading-normal);
+  color: var(--text);
+}

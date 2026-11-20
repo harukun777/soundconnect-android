@@ -1,0 +1,75 @@
+/* A small card on the rail: art, then name, state and chips, centred in a
+   column (the maintainer, 0.1.9: centre them in the card, expanded and
+   collapsed). */
+.rail-device {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.rail-device--collapsed {
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.rail-device__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-half);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.rail-device__name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+  user-select: none;
+}
+
+/* Inline text with an inline dot, so a two-line state ("Headphones off or
+   disconnected") wraps balanced with the dot on its first line. */
+.rail-device__state {
+  font-size: var(--font-size-sm);
+  text-wrap: balance;
+  line-height: var(--leading-tight);
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+/* A status dot: green while connected, quiet grey otherwise. */
+.rail-device__state::before {
+  content: "";
+  display: inline-block;
+  vertical-align: 0.1em;
+  margin-right: var(--space-1);
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--text-tertiary);
+}
+
+.rail-device__state[data-connected="true"]::before {
+  background: var(--success);
+}
+
+.rail-device__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+/* The photo sits centred in its square box, over the centred name. */
+.rail-device .device-image {
+  object-position: center;
+}

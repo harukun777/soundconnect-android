@@ -1,0 +1,151 @@
+import { create } from "zustand";
+import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import { browserLocalStorage, safeStorage } from "./safeStorage";
+
+export type ThemePreference = "system" | "light" | "dark";
+
+export const THEME_PREFERENCES: readonly ThemePreference[] = ["system", "light", "dark"];
+
+/** The app's own preferences (not the headphones'). */
+export interface SettingsValues {
+  /** "system" follows Windows; the others force a scheme (`useApplyTheme`). */
+  theme: ThemePreference;
+  /** The switch also registers or removes the autostart entry (`useStartWithWindowsToggle`). */
+  startWithWindows: boolean;
+  /** Closing the window hides it to the tray instead of quitting (Task 18). */
+  keepRunningInTray: boolean;
+  /** At autostart, open to the tray without showing the window; only meaningful with `startWithWindows`. */
+  startMinimized: boolean;
+  /** The setup wizard was finished once; a later wizard (after "Forget") skips the welcome. */
+  onboardingDone: boolean;
+  /**
+   * Connect when the remembered headphones appear in Windows' list
+   * (`setAutoConnect`, pushed by `useAutoConnectSync`). On by default since
+   * 0.1.11; finishing the setup wizard turns it on; Settings can turn it off.
+   */
+  autoConnect: boolean;
+  /** Check GitHub for a new version once a day at launch (`useAutoUpdateCheck`). */
+  checkForUpdates: boolean;
+  /** Unix ms of the last automatic update check (0: never). */
+  lastUpdateCheck: number;
+}
+
+export interface SettingsState extends SettingsValues {
+  setTheme: (theme: ThemePreference) => void;
+  setStartWithWindows: (value: boolean) => void;
+  setKeepRunningInTray: (value: boolean) => void;
+  setStartMinimized: (value: boolean) => void;
+  setOnboardingDone: (value: boolean) => void;
+  setAutoConnect: (value: boolean) => void;
+  setCheckForUpdates: (value: boolean) => void;
+  setLastUpdateCheck: (value: number) => void;
+}
+
+export const SETTINGS_DEFAULTS: SettingsValues = {
+  theme: "system",
+  startWithWindows: false,
+  keepRunningInTray: true,
+  startMinimized: false,
+  onboardingDone: false,
+  autoConnect: true,
+  checkForUpdates: true,
+  lastUpdateCheck: 0,
+};
+
+/** The single `localStorage` key holding every app setting as JSON. */
+export const SETTINGS_STORAGE_KEY = "soundconnect.settings";
+
+/**
+ * The persisted schema version. Version 2 (0.1.11) runs one migration: a
+ * version 1 entry never recorded a user's choice for `autoConnect` (it held
+ * the old default `false`), so it becomes `true` once; from then on the
+ * stored value is the user's.
+ */
+export const SETTINGS_VERSION = 2;
+
+/** Upgrades a persisted entry written by an older version (zustand's `migrate`). */
+export function migrateSettings(stored: unknown, version: number): unknown {
+  if (version < 2 && typeof stored === "object" && stored !== null) {
+    return { ...(stored as Record<string, unknown>), autoConnect: true };
+  }
+  return stored;
+}
+
+/**
+ * Keeps only well-typed known fields from whatever was stored, so a stale,
+ * hand-edited or corrupt entry can never put an invalid value into the
+ * store; anything else falls back to the defaults.
+ */
+export function sanitizeSettings(stored: unknown): Partial<SettingsValues> {
+  if (typeof stored !== "object" || stored === null) return {};
+  const raw = stored as Record<string, unknown>;
+  const clean: Partial<SettingsValues> = {};
+  if (THEME_PREFERENCES.includes(raw.theme as ThemePreference)) clean.theme = raw.theme as ThemePreference;
+  for (const key of [
+    "startWithWindows",
+    "keepRunningInTray",
+    "startMinimized",
+    "onboardingDone",
+    "autoConnect",
+    "checkForUpdates",
+  ] as const) {
+    if (typeof raw[key] === "boolean") clean[key] = raw[key];
+  }
+  if (typeof raw.lastUpdateCheck === "number" && Number.isFinite(raw.lastUpdateCheck) && raw.lastUpdateCheck >= 0) {
+    clean.lastUpdateCheck = raw.lastUpdateCheck;
+  }
+  return clean;
+}
+
+/**
+ * Builds a settings store persisted to `storage` under `SETTINGS_STORAGE_KEY`.
+ * Exported so tests can use a fake storage; the app uses `useSettingsStore`.
+ * Synchronous storage means the store is hydrated as soon as it is created,
+ * so the saved theme can be applied before the first paint.
+ */
+export function createSettingsStore(storage: StateStorage) {
+  return create<SettingsState>()(
+    persist(
+      (set) => ({
+        ...SETTINGS_DEFAULTS,
+        setTheme: (theme) => set({ theme }),
+        setStartWithWindows: (startWithWindows) => set({ startWithWindows }),
+        setKeepRunningInTray: (keepRunningInTray) => set({ keepRunningInTray }),
+        setStartMinimized: (startMinimized) => set({ startMinimized }),
+        setOnboardingDone: (onboardingDone) => set({ onboardingDone }),
+        setAutoConnect: (autoConnect) => set({ autoConnect }),
+        setCheckForUpdates: (checkForUpdates) => set({ checkForUpdates }),
+        setLastUpdateCheck: (lastUpdateCheck) => set({ lastUpdateCheck }),
+      }),
+      {
+        name: SETTINGS_STORAGE_KEY,
+        version: SETTINGS_VERSION,
+        migrate: migrateSettings,
+        storage: createJSONStorage(() => storage),
+        partialize: ({
+          theme,
+          startWithWindows,
+          keepRunningInTray,
+          startMinimized,
+          onboardingDone,
+          autoConnect,
+          checkForUpdates,
+          lastUpdateCheck,
+        }): SettingsValues => ({
+          theme,
+          startWithWindows,
+          keepRunningInTray,
+          startMinimized,
+          onboardingDone,
+          autoConnect,
+          checkForUpdates,
+          lastUpdateCheck,
+        }),
+        merge: (stored, current) => ({ ...current, ...sanitizeSettings(stored) }),
+      },
+    ),
+  );
+}
+
+/** The app's settings, persisted to `localStorage` (failures ignored, see `safeStorage`). */
+export const useSettingsStore = createSettingsStore(safeStorage(browserLocalStorage));

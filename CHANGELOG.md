@@ -1,0 +1,120 @@
+# Changelog
+
+User-facing changes in each release of SoundConnect Desktop. The release
+workflow uses the section matching a tag (`## 0.1.9` for `v0.1.9`) as the
+"What's new" part of the GitHub Release notes (`tools/release-notes.ps1`)
+and as the in-app updater's release notes.
+
+## 0.1.11 - 2026-10-14
+
+- **Connects by itself after setup**: once the headphones are set up, they
+  connect as soon as Windows connects to them, at startup and whenever they
+  come back. "Connect automatically" is now on by default and finishing
+  setup turns it on; existing installs get it on once with this update.
+  Turn it off in Settings > Headphones.
+- **No more fighting with the Sony phone app**: the headphones accept one app
+  at a time. When the phone app takes control, SoundConnect says "Another app
+  has control" and stays off the link until you select Connect or the
+  headphones are switched off and on. It no longer reconnects in a loop.
+- After you select Disconnect, SoundConnect stays disconnected until you
+  select Connect or the headphones disconnect from Windows and come back.
+- "Ready to connect" now shows only when "Connect automatically" is off.
+
+## 0.1.10 - 2026-10-14
+
+- **Shorter, plainer wording everywhere**: each status is one line,
+  "Headphones off or disconnected", "Ready to connect", "Connecting…",
+  "Connected" or "No headphones set up", and only "Connection failed" adds
+  its reason ("Another app is using the headphones.", "Connection timed
+  out." or "Connection refused.") with Try again and Bluetooth settings. The
+  tray tooltip uses the same words.
+- The setup wizard, settings, Windows audio page, update banner (Install,
+  Later, What's new) and error messages lost their extra sentences; pairing
+  instructions are two short bullets.
+- The left rail shows the battery instead of "Connected" once the
+  headphones are connected.
+
+## 0.1.9 - 2026-10-14
+
+- **Windows audio page redesigned**: a choice between **Stereo audio**
+  (games, music and video; headphone mic off) and **Mono audio with mic**
+  (voice chat and calls through the headphone mic) replaces "Fix for music"
+  and "Fix for calls". Picking a mode still previews every change first. The
+  other settings sit in three plain cards (Processing, Format and volume,
+  Connection) that show a recommendation only when something differs, and
+  Restore moved under "Advanced". "Mono audio" is now "Mono mix
+  (accessibility)" so it is not confused with the mode.
+- **Honest connection status**: the rail and Status card now say "Off or
+  out of range" when Windows does not see the headphones, "Connected to
+  Windows" when they are ready for Connect, and "Couldn't connect" only
+  after a real failed attempt; SoundConnect re-checks Windows every 3
+  seconds and, with automatic connection on, connects as soon as they
+  appear.
+- The headphones' picture, name and status are centred in the left rail.
+- **Updates itself**: SoundConnect checks GitHub once a day (Settings >
+  Updates) and offers each new version in a banner with Install now, Later
+  and Release notes; it downloads, installs and restarts by itself. This is
+  the first version that can; 0.1.8 users install 0.1.9 by hand once.
+- Release pages now start with three install steps and a fixed-name
+  **SoundConnect-Desktop-Setup.exe**; the README links straight to it.
+
+## 0.1.8 - 2026-10-14
+
+- Equalizer and Noise control are now sub-pages of Sound, listed under it in
+  the left rail with a "Sound ›" breadcrumb; the Sound page shows both at a
+  glance.
+- Card grids no longer leave a single card stranded on its own row; other
+  layout fixes from a full interface audit.
+
+## 0.1.7 - 2026-10-14
+
+- Removed mentions of 360 Reality Audio, which only Sony's phone app can set
+  up.
+
+## 0.1.6 - 2026-10-13
+
+- **Fewer dropouts**: a frame the engine cannot parse (the WH-1000XM4's
+  Speak-to-Chat preview) is skipped instead of dropping the connection.
+  Changing connection quality, DSEE or Speak-to-Chat asks first and then
+  reconnects by itself.
+- **Equalizer page** with each preset's curve, recorded from the device.
+- **Windows audio page**: how Windows treats the headphones' sound, with
+  "Fix for music", "Fix for calls" and restore.
+- Review fixes: a stale confirmation can no longer apply the wrong mode;
+  forgetting another device no longer leaves the status on "Reconnecting".
+
+## 0.1.5 - 2026-10-12
+
+- The app icon is cropped so the headphones fill the taskbar slot.
+
+## 0.1.4 - 2026-10-12
+
+- A remembered device shows its model name instead of its address.
+
+## 0.1.3 - 2026-10-12
+
+- New app icon.
+
+## 0.1.2 - 2026-10-12
+
+- First-run setup wizard; the app remembers your headphones and connects only
+  when you press Connect (or automatically, if you turn that on). It never
+  writes a setting to the headphones unless you change it.
+- Real Sony product images for each model.
+- Settings and remembered devices tolerate files saved with a BOM.
+
+## 0.1.1 - 2026-10-12
+
+- Desktop layout with a left navigation rail and card grid.
+- Ambient sound control the Sony way (one 22-stop slider), Speak-to-Chat,
+  connection quality, automatic pause.
+- Devices page: multipoint, paired devices, pairing a new device.
+
+## 0.1.0 - 2026-10-12
+
+- First installer: noise control, equalizer and DSEE, battery, now playing and
+  volume, system settings, for headphones supported by the libmdr engine
+  (tested on the WH-1000XM4).
+- Tray icon with battery and quick noise control; close to tray; start with
+  Windows.
+- Per-user NSIS installer that bundles the engine DLLs and their MIT licence.
