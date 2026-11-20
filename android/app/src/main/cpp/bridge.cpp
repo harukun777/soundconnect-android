@@ -52,7 +52,11 @@ static MDRResult poll(void* user, int) {
     auto* s = static_cast<Session*>(user);
     int result = s->env->CallIntMethod(s->transport, s->ready);
     if (exception(s) || result < 0) return MDR_RESULT_ERROR_NET;
-    return result ? MDR_RESULT_OK : MDR_RESULT_INPROGRESS;
+    // The RFCOMM socket is already connected. Poll means send OR receive can
+    // proceed, not "RX bytes are queued". Returning INPROGRESS on an empty RX
+    // buffer prevents libmdr from sending its initial request (and running its
+    // coroutine/timeouts). recv itself reports INPROGRESS when no bytes exist.
+    return MDR_RESULT_OK;
 }
 extern "C" JNIEXPORT jlong JNICALL
 Java_io_soundconnect_android_NativeEngine_create(JNIEnv* env, jclass, jobject transport, jint protocol) {
@@ -143,6 +147,7 @@ Java_io_soundconnect_android_NativeEngine_snapshot(JNIEnv* env, jclass, jlong ha
     MDRVoiceGuidance voice{}; mdrHeadphonesGetVoiceGuidance(h, &voice);
     MDRPlayback playback{}; mdrHeadphonesGetPlayback(h, &playback);
     MDRConnectionMode connection{}; mdrHeadphonesGetConnectionMode(h, &connection);
+    MDRModel model{}; mdrHeadphonesGetModel(h, &model);
     out << "],\"noise\":" << noise.mode << ",\"ambient\":" << unsigned(noise.ambient_level)
         << ",\"focus\":" << noise.focus_on_voice << ",\"speech\":" << speech.enabled
         << ",\"preset\":" << eq.preset << ",\"bass\":" << int(eq.clear_bass)
@@ -150,7 +155,8 @@ Java_io_soundconnect_android_NativeEngine_snapshot(JNIEnv* env, jclass, jlong ha
         << ",\"dseeAvailable\":" << eq.dsee_available
         << ",\"autoPause\":" << power.auto_pause << ",\"autoOff\":" << power.auto_power_off_minutes
         << ",\"voice\":" << voice.enabled << ",\"volume\":" << unsigned(playback.volume)
-        << ",\"priority\":" << connection.audio_priority << ",\"bands\":[";
+        << ",\"priority\":" << connection.audio_priority << ",\"codec\":" << model.audio_codec
+        << ",\"playback\":" << playback.status << ",\"bands\":[";
     int8_t bands[32]{}; count = 32;
     if (mdrHeadphonesGetEqualizerBands(h, bands, &count) != MDR_RESULT_OK) count = 0;
     for (uint32_t i = 0; i < count; i++) { if(i) out << ','; out << int(bands[i]); }

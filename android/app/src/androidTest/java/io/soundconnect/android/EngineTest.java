@@ -29,15 +29,30 @@ public class EngineTest {
         final byte[] rx;
         int offset;
         int sent;
+        int reads;
         ReplayTransport(byte[] rx) { this.rx = rx; }
         @Override public int read(byte[] dst) {
-            int size = Math.min(dst.length, rx.length - offset);
+            // Real devices respond only after a request, with idle gaps and
+            // partial frames. Preloading all RX used to hide a transport deadlock.
+            if (sent == 0 || reads++ % 2 == 0) return 0;
+            int size = Math.min(64, Math.min(dst.length, rx.length - offset));
             System.arraycopy(rx, offset, dst, 0, size);
             offset += size;
             return size;
         }
         @Override public boolean write(byte[] data) { sent += data.length; return true; }
-        @Override public int ready() { return 1; }
+        @Override public int ready() { return sent == 0 || offset == rx.length ? 0 : 1; }
+    }
+
+    @Test public void testInitialRequestIsSentBeforeAnyResponse() throws Exception {
+        ReplayTransport transport = new ReplayTransport(new byte[0]);
+        long handle = NativeEngine.create(transport, 1);
+        assertTrue(handle != 0);
+        try {
+            for (int i = 0; i < 8; i++) assertEquals(0, NativeEngine.tick(handle));
+            assertTrue("An idle connected socket must send the first request", transport.sent > 0);
+            assertEquals(0, new JSONObject(NativeEngine.snapshot(handle)).optInt("ready"));
+        } finally { NativeEngine.destroy(handle); }
     }
 
     @Test public void testClosedTransportReportsDisconnect() {

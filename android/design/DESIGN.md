@@ -1,5 +1,8 @@
 # Android direction
 
+Current direction (0.3.0): [REFERENCE.md](REFERENCE.md) supersedes the original direction below.
+The UI now follows Sony's gray/white/blue native screen references rather than the desktop gold palette.
+
 Anchor type: typography and live connection state. No new photography is needed for the compatibility port.
 Adopted system: src/styles/tokens.css charcoal/gold palette, adapted to Android resource tokens.
 Primary action: select a paired device and connect. Confirmed battery and device state follow below it.

@@ -1,0 +1,12 @@
+<resources>
+    <color name="surface">#1C1C1C</color>
+    <color name="card">#282828</color>
+    <color name="navigation">#242424</color>
+    <color name="text">#F2F2F2</color>
+    <color name="secondary">#C2C2C8</color>
+    <color name="accent">#BABFFE</color>
+    <color name="selected">#3E435F</color>
+    <color name="outline">#62646E</color>
+    <color name="ripple">#33BABFFE</color>
+    <color name="on_accent">#1E2250</color>
+</resources>
